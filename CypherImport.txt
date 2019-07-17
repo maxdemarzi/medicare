@@ -1,0 +1,72 @@
+
+// Schema:
+
+CREATE CONSTRAINT ON (p:Provider)
+ASSERT p.npi IS UNIQUE;
+
+CREATE CONSTRAINT ON (s:Specialty)
+ASSERT s.name IS UNIQUE;
+
+CREATE CONSTRAINT ON (l:Location)
+ASSERT l.name IS UNIQUE;
+
+CREATE CONSTRAINT ON (d:Drug)
+ASSERT d.name IS UNIQUE;
+
+CREATE CONSTRAINT ON (g:Generic)
+ASSERT g.name IS UNIQUE;
+
+// Import Nodes:
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.specialty_description AS name
+MERGE (s:Specialty {name: name});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.nppes_provider_city + " ," + line.nppes_provider_state AS name
+MERGE (l:Location {name: name});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.drug_name AS name
+MERGE (d:Drug {name: name});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.generic_name AS name
+MERGE (g:Generic {name: name});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH line
+MERGE (p:Provider {npi: line.npi})
+ON CREATE SET p.last_name = line.nppes_provider_last_org_name, p.first_name = line.nppes_provider_first_name;
+
+// Import Relationships:
+
+USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.specialty_description AS specialty_description, line.npi AS npi
+MATCH (s:Specialty {name: specialty_description}), (p:Provider {npi: npi})
+MERGE (p)-[:HAS_SPECIALTY]->(s);
+
+USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.nppes_provider_city + " ," + line.nppes_provider_state AS name, line.npi AS npi
+MATCH (l:Location {name: name}), (p:Provider {npi: npi})
+MERGE (p)-[:IN_LOCATION]->(l);
+
+USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH DISTINCT line.drug_name AS drug_name, line.generic_name AS generic_name
+MATCH (d:Drug {name: drug_name}), (g:Generic {name: generic_name})
+MERGE (d)-[:HAS_GENERIC]->(g);
+
+USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM "file:///PartD_Prescriber_PUF_NPI_Drug_17.txt" AS line FIELDTERMINATOR '\t' WITH line
+MATCH (d:Drug {name: line.drug_name}), (p:Provider {npi: line.npi})
+CREATE (p)-[:PRESCRIBED_IN_2017 {
+bene_count:COALESCE(toInteger(line.bene_count), 0),
+total_claim_count:COALESCE(toInteger(line.total_claim_count), 0),
+total_30_day_fill_count:COALESCE(toInteger(line.total_30_day_fill_count), 0),
+total_day_supply:COALESCE(toInteger(line.total_day_supply), 0),
+total_drug_cost:COALESCE(toFloat(line.total_drug_cost), 0.0),
+bene_count_ge65:COALESCE(toInteger(line.bene_count_ge65), 0),
+total_claim_count_ge65:COALESCE(toInteger(line.total_claim_count_ge65), 0),
+total_30_day_fill_count_ge65:COALESCE(toInteger(line.total_30_day_fill_count_ge65), 0),
+total_day_supply_ge65:COALESCE(toInteger(line.total_day_supply_ge65), 0),
+total_drug_cost_ge65:COALESCE(toFloat(line.total_drug_cost_ge65), 0.0) }]->(d);
