@@ -20,9 +20,11 @@ Restart your Neo4j Server. Your new Stored Procedures are available:
 
     CALL com.maxdemarzi.schema.generate();
 
-    CALL com.maxdemarzi.import(file)
-    CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_17.txt")
+    CALL com.maxdemarzi.import(reltype, file)
+    CALL com.maxdemarzi.import("PRESCRIBED_2017", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_17.txt")
     
+    CALL com.maxdemarzi.import.shared(reltype, file)
+    CALL com.maxdemarzi.import.shared("SHARED_2015", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2015-days30.txt")
 
 Data:
 -----
@@ -66,11 +68,11 @@ Sequence:
     
 2. Import the PartD files in reverse order (10-15 minutes each):
 
-        CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_17.txt")
-        CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_16.txt")
-        CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_15.txt")
-        CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_14.txt")
-        CALL com.maxdemarzi.import("/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_13.txt")
+        CALL com.maxdemarzi.import("PRESCRIBED_2017", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_17.txt")
+        CALL com.maxdemarzi.import("PRESCRIBED_2016", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_16.txt")
+        CALL com.maxdemarzi.import("PRESCRIBED_2015", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_15.txt")
+        CALL com.maxdemarzi.import("PRESCRIBED_2014", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_14.txt")
+        CALL com.maxdemarzi.import("PRESCRIBED_2013", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/PartD_Prescriber_PUF_NPI_Drug_13.txt")
 
 3. Import the Exclusions (10 seconds):
 
@@ -79,4 +81,12 @@ Sequence:
         MATCH (p:Provider {npi: line.NPI})
         SET p:Fraudster, p.excluded_date = date(line.EXCLDATE)
         
-        
+4. Import the Shared Patients:
+
+        CALL com.maxdemarzi.import.shared("SHARED_2015", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2015-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2014", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2014-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2013", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2013-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2012", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2012-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2011", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2011-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2010", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2010-days30.txt")
+        CALL com.maxdemarzi.import.shared("SHARED_2009", "/Users/maxdemarzi/Documents/Projects/medicare/neo4j-enterprise-3.5.7/import/physician-shared-patient-patterns-2009-days30.txt")

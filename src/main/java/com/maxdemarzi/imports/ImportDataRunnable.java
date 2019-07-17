@@ -23,12 +23,11 @@ public class ImportDataRunnable implements Runnable{
     private Log log;
     private RelationshipType prescribedType;
 
-    public ImportDataRunnable(String filename, GraphDatabaseService db, Log log) {
+    public ImportDataRunnable(String reltype, String filename, GraphDatabaseService db, Log log) {
         this.filename = filename;
         this.db = db;
         this.log = log;
-        int dot = filename.lastIndexOf(".");
-        this.prescribedType = RelationshipType.withName("PRESCRIBED_20" + filename.substring(dot - 2, dot));
+        this.prescribedType = RelationshipType.withName(reltype);
     }
 
     @Override

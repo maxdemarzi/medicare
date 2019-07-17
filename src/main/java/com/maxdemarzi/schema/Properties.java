@@ -23,4 +23,8 @@ public final class Properties {
     public static final String TOTAL_DAY_SUPPLY_GE65 = "total_day_supply_ge65";
     public static final String TOTAL_DRUG_COST_GE65  = "total_drug_cost_ge65";
 
+
+    public static final String PAIR_COUNT  = "pair_count";
+    public static final String SAMEDAY_COUNT  = "sameday_count";
+
 }

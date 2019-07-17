@@ -13,7 +13,7 @@
         <junit-jupiter.version>5.4.2</junit-jupiter.version>
         <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         <neo4j.driver.version>1.7.5</neo4j.driver.version>
-        <neo4j.version>3.5.6</neo4j.version>
+        <neo4j.version>3.5.7</neo4j.version>
         <fastcsv.version>1.0.3</fastcsv.version>
         <roaring.version>0.7.30</roaring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
